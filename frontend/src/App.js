@@ -1,18 +1,34 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
+import { motion } from "framer-motion";
+
+// Components
+import Header from "./components/Header";
+import Hero from "./components/Hero";
+import Services from "./components/Services";
+import Testimonials from "./components/Testimonials";
+import CaseStudies from "./components/CaseStudies";
+import Blog from "./components/Blog";
+import AppointmentCalendar from "./components/AppointmentCalendar";
+import Contact from "./components/Contact";
+import Footer from "./components/Footer";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
+const LandingPage = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
   const helloWorldApi = async () => {
     try {
       const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
+      console.log("Backend connected:", response.data.message);
     } catch (e) {
-      console.error(e, `errored out requesting / api`);
+      console.error("Backend connection failed:", e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -20,19 +36,40 @@ const Home = () => {
     helloWorldApi();
   }, []);
 
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-bg-page flex items-center justify-center">
+        <motion.div
+          animate={{ 
+            scale: [1, 1.2, 1],
+            rotate: [0, 360, 0]
+          }}
+          transition={{ 
+            duration: 2, 
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="text-4xl"
         >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
+          ⚡
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-bg-page">
+      <Header />
+      <main>
+        <Hero />
+        <Services />
+        <Testimonials />
+        <CaseStudies />
+        <Blog />
+        <AppointmentCalendar />
+        <Contact />
+      </main>
+      <Footer />
     </div>
   );
 };
@@ -42,9 +79,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route path="/" element={<LandingPage />} />
         </Routes>
       </BrowserRouter>
     </div>
